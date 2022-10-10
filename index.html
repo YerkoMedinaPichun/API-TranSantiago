@@ -151,7 +151,7 @@
     <input name="paradero" type="text" class="paradero" placeholder="PF151" required>
     <input type="submit" value="Obtener Información">
   </form>
-  <img src="assets/ball-triangle.svg" class="loader none" alt="loader">
+  <img src="ball-triangle.svg" class="loader none" alt="loader">
   <p class="error"></p>
   <div class="data">
 
@@ -172,7 +172,7 @@
     </div>
   </template> -->
   <template id="template-card">
-    <div class="card">
+    <div id="card" class="card">
       <p class="direccion"></p>
       <div class="servicios">
 
@@ -201,51 +201,71 @@
     const obtenerInformacion = async (paradero) => {
       d.querySelector(".loader").classList.remove("none");
       //${paradero}
+      if (d.querySelector(".error")) {
+        d.querySelector(".error").textContent = "";
+      }
+      if (d.querySelector(".data .card")) {
+        d.querySelector(".data .card").outerHTML = "";
+      }
+
       fetch(`https://api.xor.cl/red/bus-stop/${paradero}`)
         .then(res => res.ok ? res.json() : Promise.reject(res))
         .then(json => {
           d.querySelector(".loader").classList.add("none");
-          // console.log(json);
-          // console.log(json.name);
-          // console.log(json.id);
-          // console.log(json.services);
-          // console.log(json.services[0].id);
-          // console.log(json.services[0].valid);
-          // console.log(json.services[0].status_description);
 
-          $templateCard.querySelector(".direccion").textContent = json.name;
+          console.log(json);
+          console.log(json.name);
+          console.log($templateCard.querySelector(".direccion"));
+          // $templateCard.querySelector(".direccion").innerHTML = `${json.name}`;
+          // console.log(json);
+          d.querySelector(".data").innerHTML = `
+          <p class="direccion">${json.name}</p>
+            <div class="servicios">
+              
+            </div>
+          `;
+
           json.services.forEach(el => {
 
-            $templateServicio.querySelector(".nombre").textContent = el.id;
-            $templateServicio.querySelector(".estado").textContent = el.status_description;
+            d.querySelector(".servicios").innerHTML += `
+            <div class="servicio">
+                <p class="nombre">${el.id}</p>
+                <p class="estado" id="${el.id}">${el.status_description}</p>
+          
+              </div>
+            `;
+
             if (el.valid === true) {
-              $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Bus: ${el.buses[0].id}</p>`);
-              $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>`);
-              $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>`);
-              // $templateServicio.innerHTML = `<p>Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>`;
-              // $templateServicio.innerHTML = `<p>El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>`;
-              // $templateServicio.querySelector(".codigo-bus").textContent = `Bus: ${el.buses[0].id}`;
-              // $templateServicio.querySelector(".tiempo").textContent = `Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.`
-              // $templateServicio.querySelector(".distancia").textContent = `El bus está a ${el.buses[0].meters_distance} metros aproximadamente.`
-              console.log(el.buses[0].id);
-              console.log(el.buses[0].meters_distance);
-              console.log(el.buses[0].min_arrival_time);
-              console.log(el.buses[0].max_arrival_time);
+
+              d.getElementById(el.id).insertAdjacentHTML("afterend", `
+              <p class="codigo-bus">Bus: ${el.buses[0].id}</p>
+                <p class="tiempo">Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>
+                <p class="distancia">El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>
+              `);
+
+
             }
 
-            let $cloneServicio = $templateServicio.querySelector(".servicio").cloneNode(true);
-            $templateCard.querySelector(".servicios").appendChild($cloneServicio);
-            console.log($cloneServicio);
-            console.log($templateCard);
+
+            // $templateServicio.querySelector(".nombre").textContent = el.id;
+            // $templateServicio.querySelector(".estado").textContent = el.status_description;
+
+            // if (el.valid === true) {
+            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Bus: ${el.buses[0].id}</p>`);
+            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>`);
+            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>`);
+
+            // }
+
+            // let $cloneServicio = $templateServicio.querySelector(".servicio").cloneNode(true);
+
+            // $templateCard.querySelector(".servicios").appendChild($cloneServicio);
 
 
-            // $template.querySelector(".servicios").appendChild($templateCard);
-
-            // let $clone = $template.querySelector(".servicio").cloneNode(true);
-            // $template.querySelector(".servicios").appendChild($clone);
           });
-          d.querySelector(".data").appendChild($templateCard, true);
-          // console.log($template);
+          // d.querySelector(".data").appendChild($templateCard, true);
+
+
 
         })
         .catch(error => {
@@ -260,6 +280,7 @@
     d.addEventListener("submit", async e => {
       e.preventDefault();
       if (e.target === $formBusStation) {
+
         obtenerInformacion(e.target.paradero.value);
       }
 
