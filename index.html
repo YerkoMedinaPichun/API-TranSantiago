@@ -5,172 +5,36 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Paradero Transantiago</title>
+  <title>Info Paradero Transantiago</title>
   <!-- Importando Fuentes -->
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
     rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --fuente-principal: "Roboto", sans-serif;
 
-      --color-principal: #3b8526;
-      --color-principal-claro: #6bc349;
-      --color-principal-oscuro: #2a631c;
-
-      --color-gris-oscuro: #171615;
-      --color-gris-claro: #252525;
-      --color-gris-oscuro-transparencia: #17161580;
-
-      --color-blanco: #fff;
-      --color-claro: #f1e3e3;
-      --color-gris-alpha: #bcbcbc;
-      --color-gris-muy-claro: #d8d8d8;
-      --color-negro: #000;
-    }
-
-    html {
-      font-family: var(--fuente-principal);
-      font-size: 62.5%;
-      box-sizing: border-box;
-      text-align: center;
-      background-color: var(--color-gris-claro);
-      color: var(--color-blanco)
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: inherit;
-    }
-
-    h1 {
-      font-size: 3.8rem;
-      letter-spacing: 1.6px;
-      font-weight: 400;
-    }
-
-    .form-bus-station {
-      width: 80%;
-      margin: auto;
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 2rem;
-    }
-
-    .form-bus-station input {
-      padding: 2rem .5rem;
-      font-size: 1.8rem;
-      width: 100%;
-    }
-
-    .form-bus-station>input[type="submit"] {
-      background-color: var(--color-principal);
-      border: none;
-      font-weight: 400;
-      color: var(--color-blanco);
-      text-transform: capitalize;
-      font-size: 1.8rem;
-      letter-spacing: .2rem;
-      cursor: pointer;
-      transition: background-color ease .3s, color ease .3s;
-    }
-
-    .form-bus-station>input[type="submit"]:hover {
-      background-color: var(--color-principal-claro);
-      color: var(--color-negro);
-
-    }
-
-    .form-bus-station>input[type="submit"]:active {
-      background-color: var(--color-principal-oscuro);
-      color: var(--color-blanco);
-    }
-
-    .loader {
-      text-align: center;
-    }
-
-    .none {
-      display: none;
-    }
-
-    /* <div class="card">
-      <p class="direccion"></p>
-      <div class="servicios">
-        <div class="servicio">
-          <p class="nombre"></p>
-          <p class="estado"></p>
-          <!---true-->
-          <p class="codigo-bus"></p>
-          <p class="tiempo"></p>
-          <p class="distancia"></p>
-        </div>
-      </div>
-    </div> */
-    .card {
-      background-color: #000;
-      border-radius: .6rem;
-      font-size: 1.6rem;
-      color: var(--color-gris-alpha);
-      margin: 4rem 0;
-
-    }
-
-    .card * {
-      margin: 1rem;
-    }
-
-    .direccion {
-      padding: 2rem 0;
-    }
-
-    .servicios {
-      border: .2rem solid var(--color-gris-alpha);
-      margin-bottom: 2rem;
-    }
-
-    .servicio {
-      background-color: var(--color-principal);
-      color: var(--color-blanco)
-    }
-
-    .servicio * {
-      padding: 1rem 0;
-
-    }
   </style>
 </head>
 
 <body>
-  <h1>API Paradero Transantiago</h1>
+  <h1>Info Paradero Transantiago</h1>
+
   <form class="form-bus-station">
     <input name="paradero" type="text" class="paradero" placeholder="PF151" required>
     <input type="submit" value="Obtener Información">
   </form>
+
   <img src="ball-triangle.svg" class="loader none" alt="loader">
+
   <p class="error"></p>
+
   <div class="data">
 
   </div>
-  <!-- <template>
-    <div class="card">
-      <p class="direccion"></p>
-      <div class="servicios">
-        <div class="servicio">
-          <p class="nombre"></p>
-          <p class="estado"></p>
-          
-          <p class="codigo-bus"></p>
-          <p class="tiempo"></p>
-          <p class="distancia"></p>
-        </div>
-      </div>
-    </div>
-  </template> -->
+
   <template id="template-card">
     <div id="card" class="card">
       <p class="direccion"></p>
@@ -184,108 +48,9 @@
     <div class="servicio">
       <p class="nombre"></p>
       <p class="estado"></p>
-
     </div>
   </template>
-
-
-
-  <script>
-    const d = document,
-      $formBusStation = d.querySelector(".form-bus-station"),
-      $templateCard = d.querySelector("#template-card").content,
-      $templateServicio = d.querySelector("#template-servicio").content,
-      $fragment = d.createDocumentFragment();
-
-
-    const obtenerInformacion = async (paradero) => {
-      d.querySelector(".loader").classList.remove("none");
-      //${paradero}
-      if (d.querySelector(".error")) {
-        d.querySelector(".error").textContent = "";
-      }
-      if (d.querySelector(".data .card")) {
-        d.querySelector(".data .card").outerHTML = "";
-      }
-
-      fetch(`https://api.xor.cl/red/bus-stop/${paradero}`)
-        .then(res => res.ok ? res.json() : Promise.reject(res))
-        .then(json => {
-          d.querySelector(".loader").classList.add("none");
-
-          console.log(json);
-          console.log(json.name);
-          console.log($templateCard.querySelector(".direccion"));
-          // $templateCard.querySelector(".direccion").innerHTML = `${json.name}`;
-          // console.log(json);
-          d.querySelector(".data").innerHTML = `
-          <p class="direccion">${json.name}</p>
-            <div class="servicios">
-              
-            </div>
-          `;
-
-          json.services.forEach(el => {
-
-            d.querySelector(".servicios").innerHTML += `
-            <div class="servicio">
-                <p class="nombre">${el.id}</p>
-                <p class="estado" id="${el.id}">${el.status_description}</p>
-          
-              </div>
-            `;
-
-            if (el.valid === true) {
-
-              d.getElementById(el.id).insertAdjacentHTML("afterend", `
-              <p class="codigo-bus">Bus: ${el.buses[0].id}</p>
-                <p class="tiempo">Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>
-                <p class="distancia">El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>
-              `);
-
-
-            }
-
-
-            // $templateServicio.querySelector(".nombre").textContent = el.id;
-            // $templateServicio.querySelector(".estado").textContent = el.status_description;
-
-            // if (el.valid === true) {
-            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Bus: ${el.buses[0].id}</p>`);
-            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>Llega aprox. entre ${el.buses[0].min_arrival_time} y ${el.buses[0].max_arrival_time} minutos.</p>`);
-            //   $templateServicio.querySelector(".estado").insertAdjacentHTML("beforeend", `<p>El bus está a ${el.buses[0].meters_distance} metros aproximadamente.</p>`);
-
-            // }
-
-            // let $cloneServicio = $templateServicio.querySelector(".servicio").cloneNode(true);
-
-            // $templateCard.querySelector(".servicios").appendChild($cloneServicio);
-
-
-          });
-          // d.querySelector(".data").appendChild($templateCard, true);
-
-
-
-        })
-        .catch(error => {
-          d.querySelector(".loader").classList.add("none");
-          console.log(error);
-          let message = error.statusText || `El Paradero "${$formBusStation.firstElementChild.value}" no es Válido`;
-          d.querySelector(".loader").nextElementSibling.innerHTML = `Error ${error.status}: ${message}`
-        })
-    }
-
-
-    d.addEventListener("submit", async e => {
-      e.preventDefault();
-      if (e.target === $formBusStation) {
-
-        obtenerInformacion(e.target.paradero.value);
-      }
-
-    });
-  </script>
+  <script src="script.js" type="module"></script>
 </body>
 
 </html>
