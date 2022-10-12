@@ -122,12 +122,15 @@ img {
 .servicios {
   border: 0.2rem solid var(--color-gris-alpha);
   margin: 2rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .servicio {
   background-color: var(--color-principal);
   color: var(--color-blanco);
-  margin: 0;
+
+  width: 100%;
   border: 1px solid var(--color-blanco);
 }
 .servicio > * {
@@ -154,14 +157,17 @@ p span {
 .servicio * {
   padding: 1rem 0;
 }
+.servicio .nombre,
+.servicio .tiempo,
+.servicio .prox-bus {
+  background-color: var(--color-principal-oscuro);
+}
 
 @media (min-width: 480px) {
   .card {
     width: 45rem;
     margin: 2rem auto;
   }
-  .servicios {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .servicio {
   }
 }

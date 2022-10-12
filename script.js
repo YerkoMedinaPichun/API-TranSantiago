@@ -4,7 +4,7 @@ const d = document,
   $templateServicio = d.querySelector("#template-servicio").content,
   $fragment = d.createDocumentFragment();
 
-const obtenerInformacion = async (paradero) => {
+const obtenerInformacion = async (paradero, bus = "") => {
   d.querySelector(".loader").classList.remove("none");
   if (d.querySelector(".error")) {
     d.querySelector(".error").textContent = "";
@@ -28,9 +28,11 @@ const obtenerInformacion = async (paradero) => {
             </div>
             </div>
           `;
-
-      json.services.forEach((el) => {
-        d.querySelector(".servicios").innerHTML += `
+      console.log(bus);
+      console.log(json.services);
+      if (bus === "") {
+        json.services.forEach((el) => {
+          d.querySelector(".servicios").innerHTML += `
             <div class="servicio">
                 <p class="nombre">${el.id}</p>
                 <p class="estado" id="${el.id}">${el.status_description}</p>
@@ -38,33 +40,74 @@ const obtenerInformacion = async (paradero) => {
               </div>
             `;
 
-        if (el.valid === true) {
-          d.getElementById(el.id).insertAdjacentHTML(
-            "afterend",
-            `
+          if (el.buses[1]) {
+            d.getElementById(el.id).insertAdjacentHTML(
+              "afterend",
+              `
+                <p class="prox-bus">Próximo Bus: <span>${el.buses[1].min_arrival_time} a ${el.buses[1].max_arrival_time}</span> minutos.</p>
+                `
+            );
+          } else {
+            d.getElementById(el.id).insertAdjacentHTML(
+              "afterend",
+              `
+                <p class="prox-bus">No hay más buses disponibles.</p>
+                `
+            );
+          }
+
+          if (el.valid === true) {
+            d.getElementById(el.id).insertAdjacentHTML(
+              "afterend",
+              `
               <p class="codigo-bus">Bus: <span>${el.buses[0].id}</span></p>
                 <p class="tiempo">Llegada: <span>${el.buses[0].min_arrival_time} a ${el.buses[0].max_arrival_time}</span> minutos.</p>
                 <p class="distancia">A <span>${el.buses[0].meters_distance}</span> mts del paradero.</p>
               `
-          );
+            );
+          }
+        });
+      } else {
+        json.services.forEach((el) => {
+          console.log(el.id);
+          if (el.id === bus.toUpperCase()) {
+            d.querySelector(".servicios").innerHTML += `
+            <div class="servicio">
+                <p class="nombre">${el.id}</p>
+                <p class="estado" id="${el.id}">${el.status_description}</p>
+          
+              </div>
+            `;
 
-          // if (el.buses[1]) {
-          //   d.getElementById(el.id).insertAdjacentHTML(
-          //     "afterend",
-          //     `
-          //       <p class="prox-bus">Próximo Bus: <span>${el.buses[1].min_arrival_time} a ${el.buses[1].max_arrival_time}</span> minutos.</p>
-          //       `
-          //   );
-          // } else {
-          //   d.getElementById(el.id).insertAdjacentHTML(
-          //     "afterend",
-          //     `
-          //       <p class="prox-bus">No hay más buses disponibles.</p>
-          //       `
-          //   );
-          // }
-        }
-      });
+            if (el.buses[1]) {
+              d.getElementById(el.id).insertAdjacentHTML(
+                "afterend",
+                `
+                <p class="prox-bus">Próximo Bus: <span>${el.buses[1].min_arrival_time} a ${el.buses[1].max_arrival_time}</span> minutos.</p>
+                `
+              );
+            } else {
+              d.getElementById(el.id).insertAdjacentHTML(
+                "afterend",
+                `
+                <p class="prox-bus">No hay más buses disponibles.</p>
+                `
+              );
+            }
+
+            if (el.valid === true) {
+              d.getElementById(el.id).insertAdjacentHTML(
+                "afterend",
+                `
+              <p class="codigo-bus">Bus: <span>${el.buses[0].id}</span></p>
+                <p class="tiempo">Llegada: <span>${el.buses[0].min_arrival_time} a ${el.buses[0].max_arrival_time}</span> minutos.</p>
+                <p class="distancia">A <span>${el.buses[0].meters_distance}</span> mts del paradero.</p>
+              `
+              );
+            }
+          }
+        });
+      }
     })
     .catch((error) => {
       d.querySelector(".loader").classList.add("none");
@@ -81,6 +124,6 @@ const obtenerInformacion = async (paradero) => {
 d.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (e.target === $formBusStation) {
-    obtenerInformacion(e.target.paradero.value);
+    obtenerInformacion(e.target.paradero.value, e.target.bus.value);
   }
 });
